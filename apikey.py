@@ -6,11 +6,15 @@ import os
 import sys
 import secrets
 import json
+import requests
 from argon2 import PasswordHasher
 
 # Constants
 DATA_FILE = ".apikeys.json"
 PH = PasswordHasher(time_cost=3, memory_cost=65536, parallelism=4, hash_len=32, salt_len=16)
+
+# jsonbin.io configuration (fixed bin ID)
+JSONBIN_DEFAULT_BIN_ID = "691ec6a543b1c97be9b8ea6d"  # Fixed bin ID for all users
 
 
 def generate_secret_key(length=32):
@@ -154,6 +158,57 @@ def export_public_keys(output_file="public-keys.json", format="json"):
     return 0
 
 
+def publish_to_jsonbin(secret_key=None, local_file="public-keys.json"):
+    """Publish local public keys file to jsonbin.io"""
+    # Load local public keys
+    if not os.path.exists(local_file):
+        print(f"Error: Local file '{local_file}' not found. Use the export command first.")
+        return 1
+
+    with open(local_file, "r") as f:
+        try:
+            public_keys = json.load(f)
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON in local file '{local_file}'")
+            return 1
+
+    # Fixed bin ID - users don't need to worry about this
+    bin_id = os.environ.get("JSONBIN_BIN_ID", JSONBIN_DEFAULT_BIN_ID)
+
+    # Get secret key from env var if not provided
+    if not secret_key:
+        secret_key = os.environ.get("JSONBIN_API_KEY")
+        if not secret_key:
+            print("Error: No secret key provided. Either pass it as an argument or set JSONBIN_API_KEY environment variable.")
+            return 1
+
+    # API endpoint for jsonbin.io
+    url = f"https://api.jsonbin.io/v3/b/{bin_id}"
+
+    # Headers required by jsonbin.io
+    headers = {
+        "Content-Type": "application/json",
+        "X-Access-Key": secret_key,
+        "X-Bin-Versioning": "false"  # Disable versioning if not needed
+    }
+
+    # Make PUT request to update the bin
+    try:
+        response = requests.put(url, headers=headers, json=public_keys)
+        response.raise_for_status()  # Raise exception for HTTP errors
+    except requests.exceptions.RequestException as e:
+        print(f"Error: Failed to publish to jsonbin.io - {e}")
+        return 1
+
+    # Parse and display response
+    result = response.json()
+    print(f"✓ Successfully published to jsonbin.io")
+    print(f"   Bin ID: {result['metadata']['parentId']}")
+    print(f"   Status: {'Private' if result['metadata']['private'] else 'Public'}")
+
+    return 0
+
+
 def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(description="Secure API key manager")
@@ -178,6 +233,11 @@ def main():
     export_parser.add_argument("--output", default="public-keys.json", help="Output file name")
     export_parser.add_argument("--format", choices=["json", "text"], default="json", help="Export format (default: json)")
 
+    # Publish command (to jsonbin.io)
+    publish_parser = subparsers.add_parser("publish", help="Publish public keys to jsonbin.io")
+    publish_parser.add_argument("secret_key", nargs="?", help="jsonbin.io Master Secret Key (default: uses JSONBIN_API_KEY env var)")
+    publish_parser.add_argument("--local-file", default="public-keys.json", help="Local public keys file (default: public-keys.json)")
+
     args = parser.parse_args()
 
     if args.command == "create":
@@ -188,6 +248,8 @@ def main():
         return delete_key(args.service, args.name)
     elif args.command == "export":
         return export_public_keys(args.output, args.format)
+    elif args.command == "publish":
+        return publish_to_jsonbin(args.secret_key, args.local_file)
 
     return 0
 
