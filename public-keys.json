@@ -1,1 +1,5 @@
-[{"key_id": "test_key_123", "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBmRjZ7kC51X9X5v1X5v1X5v1X5v1X5v1X5v1X5v1"}]
+{
+  "media-match": {
+    "lgg-team": "$argon2id$v=19$m=65536,t=3,p=4$zcaV3x5YQynEe94SM+iysg$8/r2g+B1zq2MmbKbTkrVMmY8Xdo9pkHC0gJ5OLmlt5U"
+  }
+}
