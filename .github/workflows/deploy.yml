@@ -52,15 +52,21 @@ jobs:
           </html>
           EOF
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Debug - List deploy directory contents
+        run: |
+          ls -la deploy/
+          ls -la deploy/keys/
+
+      - name: Upload artifact using upload-pages-artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: apikey-config-pages
           path: deploy/
-          retention-days: 3
+
+      - name: Debug - Check artifact creation
+        run: |
+          echo "Checking artifacts created in this workflow run..."
+          echo " (Note: This step requires gh CLI, but we can skip detailed checks here)"
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          artifact_name: apikey-config-pages
