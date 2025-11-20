@@ -53,6 +53,7 @@ jobs:
                 <li><a href="/keys/public-keys.json">JSON format (recommended)</a></li>
                 <li><a href="/keys/public-keys.txt">Text format (legacy)</a></li>
               </ul>
+              <p>For documentation, see <a href="https://github.com/cyanru/apikey-config#verification-flow">the GitHub repository</a>.</p>
           </body>
           </html>
           EOF
