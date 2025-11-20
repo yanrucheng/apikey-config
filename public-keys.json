@@ -1,5 +1,8 @@
 {
   "media-match": {
     "lgg-team": "$argon2id$v=19$m=65536,t=3,p=4$zcaV3x5YQynEe94SM+iysg$8/r2g+B1zq2MmbKbTkrVMmY8Xdo9pkHC0gJ5OLmlt5U"
+  },
+  "test-service": {
+    "test-account": "$argon2id$v=19$m=65536,t=3,p=4$Ky7v9BI/MgR8LcMjVs6rHQ$4yFzD/3vds5yEaLC+lXOE9XxSpdLWattmGFgacjLPnA"
   }
 }
