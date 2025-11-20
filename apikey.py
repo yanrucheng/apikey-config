@@ -94,15 +94,22 @@ def delete_key(name):
     return 0
 
 
-def export_public_keys(output_file="public-keys.txt"):
+def export_public_keys(output_file="public-keys.json", format="json"):
     """Export public keys for GitHub Pages"""
     keys = load_keys()
 
-    with open(output_file, "w") as f:
-        for name, public_key in sorted(keys.items()):
-            f.write(f"{name}|{public_key}\n")
+    if format == "json":
+        with open(output_file, "w") as f:
+            json.dump(keys, f, indent=2, sort_keys=True)
+    elif format == "text":
+        with open(output_file, "w") as f:
+            for name, public_key in sorted(keys.items()):
+                f.write(f"{name}|{public_key}\n")
+    else:
+        print(f"Error: Unsupported format '{format}' - use 'json' or 'text'")
+        return 1
 
-    print(f"✓ Exported {len(keys)} public keys to '{output_file}'")
+    print(f"✓ Exported {len(keys)} public keys to '{output_file}' in {format} format")
     return 0
 
 
@@ -124,7 +131,8 @@ def main():
 
     # Export command (for GitHub Pages)
     export_parser = subparsers.add_parser("export", help="Export public keys for GitHub Pages")
-    export_parser.add_argument("--output", default="public-keys.txt", help="Output file name")
+    export_parser.add_argument("--output", default="public-keys.json", help="Output file name")
+    export_parser.add_argument("--format", choices=["json", "text"], default="json", help="Export format (default: json)")
 
     args = parser.parse_args()
 
@@ -135,7 +143,7 @@ def main():
     elif args.command == "delete":
         return delete_key(args.name)
     elif args.command == "export":
-        return export_public_keys(args.output)
+        return export_public_keys(args.output, args.format)
 
     return 0
 

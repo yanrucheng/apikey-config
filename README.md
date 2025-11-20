@@ -63,16 +63,22 @@ Output:
 
 ### Export Public Keys (for GitHub Pages)
 
+**JSON format (industry recommended)**:
 ```bash
-apikey export --output public-keys.txt
+apikey export --output public-keys.json
+```
+
+**Text format (legacy)**:
+```bash
+apikey export --output public-keys.txt --format text
 ```
 
 Output:
 ```
-✓ Exported 2 public keys to 'public-keys.txt'
+✓ Exported 2 public keys to 'public-keys.json' in json format
 ```
 
-The `public-keys.txt` file can be published to GitHub Pages for external services to access.
+The exported file (`public-keys.json` or `public-keys.txt`) can be published to GitHub Pages for external services to access.
 
 ## Verification Flow
 
@@ -94,25 +100,53 @@ The `public-keys.txt` file can be published to GitHub Pages for external service
 
 ## Example Verification (for Service Developers)
 
-Services can verify keys like this:
-
+### JSON Format (Recommended)
 ```python
+import requests
+import json
 from argon2 import PasswordHasher
 
-ph = PasswordHasher()
-stored_public_key = "$argon2id$v=19$m=65536,t=3,p=4$rYIN6XsdD..."
+def verify_api_key(secret_key):
+    # Fetch public keys from GitHub Pages
+    response = requests.get("https://your-username.github.io/apikey-config/public-keys.json")
+    public_keys = response.json()
 
-try:
-    ph.verify(stored_public_key, user_provided_secret)
-    # Authentication successful
-except VerifyMismatchError:
-    # Authentication failed
+    ph = PasswordHasher()
+    for name, stored_public_key in public_keys.items():
+        try:
+            ph.verify(stored_public_key, secret_key)
+            return True, name
+        except VerifyMismatchError:
+            continue
+    return False, None
+```
+
+### Text Format
+```python
+import requests
+from argon2 import PasswordHasher
+
+def verify_api_key(secret_key):
+    # Fetch public keys from GitHub Pages
+    response = requests.get("https://your-username.github.io/apikey-config/public-keys.txt")
+
+    ph = PasswordHasher()
+    for line in response.text.splitlines():
+        if line and "|" in line:
+            name, stored_public_key = line.split("|", 1)
+            try:
+                ph.verify(stored_public_key, secret_key)
+                return True, name
+            except VerifyMismatchError:
+                continue
+    return False, None
 ```
 
 ## Files
 
-- `.apikeys`: Local storage of name-to-public-key mappings (never commit this!)
-- `public-keys.txt`: Exported public keys (safe to commit/publish)
+- `.apikeys.json`: Local JSON storage of name-to-public-key mappings (never commit this!)
+- `public-keys.json`: Exported public keys in JSON format (safe to commit/publish - industry recommended)
+- `public-keys.txt`: Exported public keys in text format (safe to commit/publish - legacy support)
 
 ## License
 

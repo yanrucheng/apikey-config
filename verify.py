@@ -2,6 +2,8 @@
 """Example script showing how to verify API keys using public keys"""
 
 import sys
+import json
+import os
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
@@ -10,14 +12,22 @@ from argon2.exceptions import VerifyMismatchError
 def fetch_public_keys_from_github_pages():
     """Simulate fetching public keys from GitHub Pages"""
     # In real scenario, this would use requests.get()
-    with open("public-keys.txt", "r") as f:
-        keys = {}
-        for line in f:
-            line = line.strip()
-            if line and "|" in line:
-                name, public_key = line.split("|", 1)
-                keys[name] = public_key
-    return keys
+    # Try JSON first (industry recommended)
+    if os.path.exists("public-keys.json"):
+        with open("public-keys.json", "r") as f:
+            return json.load(f)
+    # Fallback to text format
+    elif os.path.exists("public-keys.txt"):
+        with open("public-keys.txt", "r") as f:
+            keys = {}
+            for line in f:
+                line = line.strip()
+                if line and "|" in line:
+                    name, public_key = line.split("|", 1)
+                    keys[name] = public_key
+            return keys
+    # No public keys file found
+    return {}
 
 
 def verify_api_key(secret_key):
