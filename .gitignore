@@ -1,0 +1,14 @@
+# API key storage (never commit!)
+.apikeys*
+
+# Virtual environment
+.venv
+*.pyc
+__pycache__/
+
+# Environment variables
+.env
+.envrc
+
+# Logs
+*.log
