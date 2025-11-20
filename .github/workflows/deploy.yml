@@ -52,11 +52,6 @@ jobs:
           </html>
           EOF
 
-      - name: Delete existing github-pages artifact
-        uses: actions/delete-artifact@v4
-        with:
-          name: github-pages
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
