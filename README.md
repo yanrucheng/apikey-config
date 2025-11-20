@@ -80,6 +80,38 @@ Output:
 
 The exported file (`public-keys.json` or `public-keys.txt`) can be published to GitHub Pages for external services to access.
 
+### Deploy to GitHub Pages (Automated)
+
+This repository includes a GitHub Actions workflow that automatically deploys public keys to GitHub Pages whenever changes are pushed to the main branch.
+
+#### How it works:
+1. Export your public keys locally:
+   ```bash
+   apikey export --output public-keys.json
+   ```
+
+2. Commit the exported public keys file:
+   ```bash
+   git add public-keys.json
+   git commit -m "Update public keys"
+   ```
+
+3. Push to GitHub:
+   ```bash
+   git push origin main
+   ```
+
+4. GitHub Actions will automatically:
+   - Checkout the latest code
+   - Deploy the public-keys.json (and public-keys.txt if exists) to GitHub Pages
+   - Make them available at a URL like: `https://your-username.github.io/apikey-config/keys/public-keys.json`
+
+#### GitHub Pages Setup:
+1. Go to your GitHub repository settings
+2. Navigate to "Pages" section
+3. Under "Build and deployment", select "GitHub Actions" as the source
+4. The workflow will be automatically detected and run on pushes
+
 ## Verification Flow
 
 1. **Service Setup**: External services fetch public keys from your GitHub Pages

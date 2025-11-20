@@ -1,0 +1,66 @@
+name: Deploy Public Keys to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create deploy directory
+        run: |
+          mkdir -p deploy/keys
+
+      - name: Copy public keys (if exists)
+        run: |
+          mkdir -p deploy/keys
+          if [ -f public-keys.json ]; then
+            cp public-keys.json deploy/keys/
+          fi
+          if [ -f public-keys.txt ]; then
+            cp public-keys.txt deploy/keys/
+          fi
+
+      - name: Create index.html
+        run: |
+          cat > deploy/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>API Public Keys</title>
+          </head>
+          <body>
+              <h1>API Public Keys</h1>
+              <p>Public keys for API authentication:</p>
+              <ul>
+                <li><a href="/keys/public-keys.json">JSON format (recommended)</a></li>
+                <li><a href="/keys/public-keys.txt">Text format (legacy)</a></li>
+              </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: deploy/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
