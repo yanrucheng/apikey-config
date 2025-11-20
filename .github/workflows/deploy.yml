@@ -50,8 +50,8 @@ jobs:
               <h1>API Public Keys</h1>
               <p>Public keys for API authentication:</p>
               <ul>
-                <li><a href="/apikey-config/keys/public-keys.json">JSON format (recommended)</a></li>
-                <li><a href="/apikey-config/keys/public-keys.txt">Text format (legacy)</a></li>
+                <li><a href="/keys/public-keys.json">JSON format (recommended)</a></li>
+                <li><a href="/keys/public-keys.txt">Text format (legacy)</a></li>
               </ul>
           </body>
           </html>
