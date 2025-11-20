@@ -35,14 +35,26 @@ def verify_api_key(secret_key):
     ph = PasswordHasher()
     public_keys = fetch_public_keys_from_github_pages()
 
-    for name, stored_public_key in public_keys.items():
-        try:
-            # This will raise VerifyMismatchError if secret doesn't match
-            ph.verify(stored_public_key, secret_key)
-            print(f"✓ Secret key is valid for '{name}'")
-            return True, name
-        except VerifyMismatchError:
-            continue  # Try next key
+    # Check if it's the new service-based structure
+    if isinstance(public_keys, dict):
+        for service, service_keys in public_keys.items():
+            if isinstance(service_keys, dict):
+                # New structure: service -> keys
+                for name, stored_public_key in service_keys.items():
+                    try:
+                        ph.verify(stored_public_key, secret_key)
+                        print(f"✓ Secret key is valid for '{name}' in service '{service}'")
+                        return True, f"{service}.{name}"
+                    except VerifyMismatchError:
+                        continue
+            else:
+                # Legacy structure: name -> key
+                try:
+                    ph.verify(service_keys, secret_key)
+                    print(f"✓ Secret key is valid for '{service}' (legacy format)")
+                    return True, service
+                except VerifyMismatchError:
+                    continue
 
     print("✗ Invalid secret key")
     return False, None
