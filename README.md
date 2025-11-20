@@ -104,7 +104,7 @@ This repository includes a GitHub Actions workflow that automatically deploys pu
 4. GitHub Actions will automatically:
    - Checkout the latest code
    - Deploy the public-keys.json (and public-keys.txt if exists) to GitHub Pages
-   - Make them available at a URL like: `https://your-username.github.io/apikey-config/keys/public-keys.json`
+   - Make them available at: `https://apikeys.cyanru.com/keys/public-keys.json`
 
 #### GitHub Pages Setup:
 1. Go to your GitHub repository settings
@@ -140,7 +140,7 @@ from argon2 import PasswordHasher
 
 def verify_api_key(secret_key):
     # Fetch public keys from GitHub Pages
-    response = requests.get("https://your-username.github.io/apikey-config/public-keys.json")
+    response = requests.get("https://apikeys.cyanru.com/keys/public-keys.json")
     public_keys = response.json()
 
     ph = PasswordHasher()
@@ -160,7 +160,7 @@ from argon2 import PasswordHasher
 
 def verify_api_key(secret_key):
     # Fetch public keys from GitHub Pages
-    response = requests.get("https://your-username.github.io/apikey-config/public-keys.txt")
+    response = requests.get("https://apikeys.cyanru.com/keys/public-keys.txt")
 
     ph = PasswordHasher()
     for line in response.text.splitlines():

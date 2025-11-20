@@ -34,6 +34,9 @@ jobs:
           if [ -f public-keys.txt ]; then
             cp public-keys.txt deploy/keys/
           fi
+          if [ -f CNAME ]; then
+            cp CNAME deploy/
+          fi
 
       - name: Create index.html
         run: |
