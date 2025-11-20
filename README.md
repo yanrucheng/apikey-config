@@ -27,7 +27,7 @@ uv pip install -e .
 ### Create an API Key
 
 ```bash
-apikey create ai-album
+uv run python apikey.py create ai-album
 ```
 
 Output:
@@ -40,7 +40,7 @@ Output:
 ### List Keys
 
 ```bash
-apikey list
+uv run python apikey.py list
 ```
 
 Output:
@@ -53,7 +53,7 @@ ai-album             $argon2id$v=19$m=65536,t=3,p=4$rYIN6XsdD...
 ### Delete a Key
 
 ```bash
-apikey delete ai-album
+uv run python apikey.py delete ai-album
 ```
 
 Output:
@@ -65,12 +65,12 @@ Output:
 
 **JSON format (industry recommended)**:
 ```bash
-apikey export --output public-keys.json
+uv run python apikey.py export --output public-keys.json
 ```
 
 **Text format (legacy)**:
 ```bash
-apikey export --output public-keys.txt --format text
+uv run python apikey.py export --output public-keys.txt --format text
 ```
 
 Output:
@@ -87,7 +87,7 @@ This repository includes a GitHub Actions workflow that automatically deploys pu
 #### How it works:
 1. Export your public keys locally:
    ```bash
-   apikey export --output public-keys.json
+   uv run python apikey.py export --output public-keys.json
    ```
 
 2. Commit the exported public keys file:
