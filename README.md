@@ -26,13 +26,20 @@ uv pip install -e .
 
 ### Create an API Key
 
+API keys are now associated with services. Use:
+
 ```bash
-uv run python apikey.py create ai-album
+uv run python apikey.py create <service> <name>
+```
+
+Example:
+```bash
+uv run python apikey.py create analytics api-key-1
 ```
 
 Output:
 ```
-✓ Created API key 'ai-album'
+✓ Created API key 'api-key-1' in service 'analytics'
    Secret key: ld1X0w5kRu-pQot97ZT2FBQiawYYMWOcgZX4hR5TOf0
    (⚠️  This secret will never be shown again - store it securely!)
 ```
@@ -46,19 +53,46 @@ uv run python apikey.py list
 Output:
 ```
 Stored API keys:
-----------------------------------------
-ai-album             $argon2id$v=19$m=65536,t=3,p=4$rYIN6XsdD...
+---------------------------------------------------------------------------
+Service: analytics
+---------------------------------------------------------------------------
+api-key-1            $argon2id$v=19$m=65536,t=3,p=4$rYIN6XsdD...
+api-key-2            $argon2id$v=19$m=65536,t=3,p=4$abcdef123...
+
+Service: payment
+---------------------------------------------------------------------------
+stripe-key           $argon2id$v=19$m=65536,t=3,p=4$xyz456...
+```
+
+To list keys for a specific service:
+```bash
+uv run python apikey.py list --service analytics
+```
+
+Output:
+```
+Stored API keys:
+---------------------------------------------------------------------------
+Service: analytics
+---------------------------------------------------------------------------
+api-key-1            $argon2id$v=19$m=65536,t=3,p=4$rYIN6XsdD...
+api-key-2            $argon2id$v=19$m=65536,t=3,p=4$abcdef123...
 ```
 
 ### Delete a Key
 
 ```bash
-uv run python apikey.py delete ai-album
+uv run python apikey.py delete <service> <name>
+```
+
+Example:
+```bash
+uv run python apikey.py delete analytics api-key-2
 ```
 
 Output:
 ```
-✓ Deleted API key 'ai-album'
+✓ Deleted API key 'api-key-2' from service 'analytics'
 ```
 
 ### Export Public Keys (for GitHub Pages)
@@ -68,14 +102,34 @@ Output:
 uv run python apikey.py export --output public-keys.json
 ```
 
+This exports the keys in a service-based structure:
+```json
+{
+  "analytics": {
+    "api-key-1": "$argon2id$v=19$m=65536,t=3,p=4$rYIN6XsdD...",
+    "api-key-2": "$argon2id$v=19$m=65536,t=3,p=4$abcdef123..."
+  },
+  "payment": {
+    "stripe-key": "$argon2id$v=19$m=65536,t=3,p=4$xyz456..."
+  }
+}
+```
+
 **Text format (legacy)**:
 ```bash
 uv run python apikey.py export --output public-keys.txt --format text
 ```
 
-Output:
+This exports in a flattened format with service names prefixed:
 ```
-✓ Exported 2 public keys to 'public-keys.json' in json format
+analytics.api-key-1|$argon2id$v=19$m=65536,t=3,p=4$rYIN6XsdD...
+analytics.api-key-2|$argon2id$v=19$m=65536,t=3,p=4$abcdef123...
+payment.stripe-key|$argon2id$v=19$m=65536,t=3,p=4$xyz456...
+```
+
+Output example:
+```
+✓ Exported 3 public keys to 'public-keys.json' in json format
 ```
 
 The exported file (`public-keys.json` or `public-keys.txt`) can be published to GitHub Pages for external services to access.
