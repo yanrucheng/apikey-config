@@ -23,11 +23,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create deploy directory
-        run: |
-          mkdir -p deploy/keys
-
-      - name: Copy public keys (if exists)
+      - name: Prepare deployment files
         run: |
           mkdir -p deploy/keys
           if [ -f public-keys.json ]; then
@@ -56,15 +52,16 @@ jobs:
           </html>
           EOF
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Delete existing github-pages artifact
+        uses: actions/delete-artifact@v4
         with:
-          name: apikey-pages-artifact
+          name: github-pages
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
           path: deploy/
-          retention-days: 1
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          artifact_name: apikey-pages-artifact
